@@ -2,42 +2,26 @@ import express, { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import bodyParser from "body-parser";
 import { authFactory } from "./services/auth";
-
-const { APP_PORT, JWT_SECRET } = process.env;
+import checkAuth from "./middleware/check-auth";
+const APP_PORT = process.env.APP_PORT || 3000;
+const JWT_SECRET = process.env.JWT_SECRET || "secret";
 const app = express();
-const auth = authFactory(JWT_SECRET);
 
 if (!APP_PORT || !JWT_SECRET) {
   throw new Error("Missing environment variables");
 }
-// routes that don't require authentication
-const unprotectedRoutes = ["/auth"];
 
-// AUTH middleware
-
-const checkAuth = (req: Request, res: Response, next) => {
-  if (unprotectedRoutes.includes(req.path)) {
-    next();
-  }
-  if (!req.headers.authorization) {
-    return res.status(401).send("error: no authorization header");
-  }
-
-  try {
-    const token = req.headers.authorization?.split(" ")[1];
-    jwt.verify(token, JWT_SECRET);
-    next();
-  } catch (e) {
-    return res.status(401).send("Unauthorized");
-  }
-};
-
+const auth = authFactory(JWT_SECRET);
 app.use(bodyParser.json());
 app.use(checkAuth);
 
-app.get("/auth", (req, res) => {
+app.post("/auth", (req, res) => {
   const token = auth(req.body.username, req.body.password);
-  res.send(token);
+  if (token) {
+    res.send(token);
+  } else {
+    res.status(401).send("Something went wrong authorizing the user");
+  }
 });
 
 app.listen(APP_PORT, () => {
