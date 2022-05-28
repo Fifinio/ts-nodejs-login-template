@@ -4,7 +4,7 @@
   "description": "API for scheduler applliaction",
   "main": "index.ts",
   "scripts": {
-    "start": "npx nodemon ./src/index.ts",
+    "start": "npx nodemon index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Filip Borowy",
