@@ -1,7 +1,9 @@
 import * as UserModel from '../models/users.model';
 import crypto from 'crypto';
+import {Request ,Response} from 'express';
 
-export const insert = (req, res) => {
+export const insert = (req: Request, res: Response) => {
+    console.log('got to the controller - insert')
     let salt = crypto.randomBytes(16).toString('base64');
     let hash = crypto.createHmac('sha512', salt).update(req.body.password).digest("base64");
     req.body.password = salt + "$" + hash;
@@ -12,13 +14,12 @@ export const insert = (req, res) => {
         });
 };
 
-export const list = (req, res) => {
-    let limit = req.query.limit && req.query.limit <= 100 ? parseInt(req.query.limit) : 10;
+export const list = (req: Request, res: Response) => {
+    let limit = req.query.limit?.toString() && parseInt(req.query.limit.toString()) <= 100 ? parseInt(req.query.limit.toString()) : 10;
     let page = 0;
     if (req.query) {
         if (req.query.page) {
-            req.query.page = parseInt(req.query.page);
-            page = Number.isInteger(req.query.page) ? req.query.page : 0;
+            page = Number.isInteger(req.query.page.toString()) ? parseInt(req.query.page.toString()) : 0;
         }
     }
     UserModel.list(limit, page)
@@ -27,13 +28,13 @@ export const list = (req, res) => {
         })
 };
 
-export const getById = (req, res) => {
+export const getById = (req: Request, res: Response) => {
     UserModel.findById(req.params.userId)
         .then((result) => {
             res.status(200).send(result);
         });
 };
-export const patchById = (req, res) => {
+export const patchById = (req: Request, res: Response) => {
     if (req.body.password) {
         let salt = crypto.randomBytes(16).toString('base64');
         let hash = crypto.createHmac('sha512', salt).update(req.body.password).digest("base64");
@@ -47,7 +48,7 @@ export const patchById = (req, res) => {
 
 };
 
-export const removeById = (req, res) => {
+export const removeById = (req: Request, res: Response) => {
     UserModel.removeById(req.params.userId)
         .then((result)=>{
             res.status(204).send({});

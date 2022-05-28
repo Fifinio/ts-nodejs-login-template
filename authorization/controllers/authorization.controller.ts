@@ -1,11 +1,11 @@
 import {config} from '../../common/config/env.config';
 import jwt from 'jsonwebtoken'
 import crypto from 'crypto';
-import uuid from 'crypto';
+import {Request, Response } from 'express';
 
 const jwtSecret = config['jwt_secret'];
 
-export const login = (req, res) => {
+export const login = (req: Request, res: Response) => {
     try {
         let refreshId = req.body.userId + jwtSecret;
         let salt = crypto.randomBytes(16).toString('base64');
@@ -20,10 +20,9 @@ export const login = (req, res) => {
     }
 };
 
-export const refresh_token = (req, res) => {
+export const refresh_token = (req: Request, res: Response) => {
     try {
-        req.body = req.jwt;
-        let token = jwt.sign(req.body, jwtSecret);
+        let token = jwt.sign(req.body.jwt, jwtSecret);
         res.status(201).send({id: token});
     } catch (err) {
         res.status(500).send({errors: err});

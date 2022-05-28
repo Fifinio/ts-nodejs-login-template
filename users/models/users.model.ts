@@ -1,5 +1,6 @@
 import mongoose,{Model, Schema} from 'mongoose';
 import IUser from '../IUser';
+import db from '../../common/services/mongoose.service'
 
 const userSchema = new Schema<IUser>({
     firstName: String,
@@ -22,27 +23,29 @@ userSchema.methods.findById = function (id: string) {
 };
 // userSchema.findById throws type error ???
 
-const User = mongoose.model('Users', userSchema);
+const User = db.model('Users', userSchema);
 
 
-export const findByEmail = (email) => {
+export const findByEmail = (email: string) => {
     return User.find({email: email});
 };
-export const findById = (id) => {
-    return User.findById(id)
-        .then((result) => {
-            delete result._id;
-            delete result.__v;
-            return result.toJSON();
-        });
+export const findById = async (id: string) => {
+    // infer type of result
+    const result: any = await User.findById(id);
+    if (result) {
+        delete result._id;
+        delete result.__v;
+        return result.toJSON();
+    }
 };
 
-export const createUser = (userData) => {
+export const createUser = (userData: IUser) => {
+    console.log('got to the model - createUser')
     const user = new User(userData);
     return user.save();
 };
 
-export const list = (perPage, page) => {
+export const list = (perPage: number, page: number) => {
     return new Promise((resolve, reject) => {
         User.find()
             .limit(perPage)
@@ -57,13 +60,13 @@ export const list = (perPage, page) => {
     });
 };
 
-export const patchUser = (id, userData) => {
+export const patchUser = (id: string, userData: mongoose.UpdateQuery<IUser>) => {
     return User.findOneAndUpdate({
         _id: id
     }, userData);
 };
 
-export const removeById = (userId) => {
+export const removeById = (userId: string) => {
     return new Promise((resolve, reject) => {
         User.deleteMany({_id: userId}, (err) => {
             if (err) {

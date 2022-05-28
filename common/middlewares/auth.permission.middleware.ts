@@ -1,11 +1,11 @@
 import { Request, Response,NextFunction } from "express";
-import { config } from '../config/env.config'
+import { config } from "../config/env.config";
 const ADMIN_PERMISSION = config['permissionLevels']['ADMIN'];
 
-export const minimumPermissionLevelRequired = (required_permission_level) => {
-    return (req, res, next) => {
-        let user_permission_level = parseInt(req.jwt.permissionLevel);
-        let userId = req.jwt.userId;
+export const minimumPermissionLevelRequired = (required_permission_level: number) => {
+    return (req: Request, res: Response, next: NextFunction) => {
+        let user_permission_level = parseInt(req.body.jwt.permissionLevel);
+        let userId = req.body.jwt.userId;
         if (user_permission_level & required_permission_level) {
             return next();
         } else {
@@ -14,9 +14,9 @@ export const minimumPermissionLevelRequired = (required_permission_level) => {
     };
 };
 
-export const onlySameUserOrAdminCanDoThisAction = (req, res, next) => {
-    let user_permission_level = parseInt(req.jwt.permissionLevel);
-    let userId = req.jwt.userId;
+export const onlySameUserOrAdminCanDoThisAction = (req: Request, res: Response, next: NextFunction) => {
+    let user_permission_level = parseInt(req.body.jwt.permissionLevel);
+    let userId = req.body.jwt.userId;
     if (req.params && req.params.userId && userId === req.params.userId) {
         return next();
     } else {
@@ -28,8 +28,8 @@ export const onlySameUserOrAdminCanDoThisAction = (req, res, next) => {
     }
 };
 
-export const sameUserCantDoThisAction = (req, res, next) => {
-    let userId = req.jwt.userId;
+export const sameUserCantDoThisAction = (req: Request, res: Response, next: NextFunction) => {
+    let userId = req.body.jwt.userId;
     if (req.params.userId !== userId) {
         return next();
     } else {

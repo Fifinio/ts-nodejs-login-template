@@ -1,7 +1,8 @@
 import * as UserModel from '../../users/models/users.model';
 import crypto from 'crypto';
+import { NextFunction, Request, Response } from 'express';
 
-export const hasAuthValidFields = (req, res, next) => {
+export const hasAuthValidFields = (req: Request, res: Response, next: NextFunction) => {
     let errors = [];
 
     if (req.body) {
@@ -22,7 +23,7 @@ export const hasAuthValidFields = (req, res, next) => {
     }
 };
 
-export const isPasswordAndUserMatch = (req, res, next) => {
+export const isPasswordAndUserMatch = (req: Request, res: Response, next: NextFunction) => {
     UserModel.findByEmail(req.body.email)
         .then((user)=>{
             if(!user[0]){

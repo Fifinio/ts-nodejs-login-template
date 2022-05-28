@@ -1,27 +1,32 @@
 import mongoose from 'mongoose';
 let count = 0;
+const DB_CONNECTION_STRING = process.env.DB_CONNECTION_STRING;
 
-const DB_CONNECTION_STRING = process.env.MONGODB_URI;
+
+
 const options = {
     autoIndex: false, // Don't build indexes
-    poolSize: 10, // Maintain up to 10 socket connections
     // If not connected, return errors immediately rather than waiting for reconnect
-    bufferMaxEntries: 0, 
     // all other approaches are now deprecated by MongoDB:
     useNewUrlParser: true,
     useUnifiedTopology: true
 };
 
+const db = mongoose;
+console.log(DB_CONNECTION_STRING);
+if(!DB_CONNECTION_STRING) throw new Error('DB_CONNECTION_STRING is not defined');
+
 const connectWithRetry = () => {
     console.log('MongoDB connection with retry')
-    mongoose.connect(DB_CONNECTION_STRING, options).then(()=>{
+    db.connect(DB_CONNECTION_STRING, options).then(()=>{
         console.log('MongoDB is connected')
     }).catch(err=>{
         console.log('MongoDB connection unsuccessful, retry after 5 seconds. ', ++count);
+        console.log(err)
         setTimeout(connectWithRetry, 5000)
     })
 };
 
 connectWithRetry();
 
-export const db = connectWithRetry;
+export default db
