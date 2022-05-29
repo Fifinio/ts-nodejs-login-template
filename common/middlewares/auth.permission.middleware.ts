@@ -16,7 +16,7 @@ export const minimumPermissionLevelRequired = (required_permission_level: number
 
 export const onlySameUserOrAdminCanDoThisAction = (req: Request, res: Response, next: NextFunction) => {
     let user_permission_level = parseInt(req.body.jwt.permissionLevel);
-    let userId = req.body.jwt.userId;
+    let userId = req.body.jwt.userId
     if (req.params && req.params.userId && userId === req.params.userId) {
         return next();
     } else {

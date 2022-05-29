@@ -1,7 +1,9 @@
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+dotenv.config();
+
 let count = 0;
 const DB_CONNECTION_STRING = process.env.DB_CONNECTION_STRING;
-
 
 
 const options = {
